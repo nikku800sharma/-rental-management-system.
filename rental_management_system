@@ -1,0 +1,85 @@
+import csv
+import os
+from tabulate import tabulate
+
+FILENAME = "tenants.csv"
+
+# Create the file with headers if it doesn't exist
+if not os.path.exists(FILENAME):
+    with open(FILENAME, "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow(["Name", "Phone", "Address", "Rent", "Paid Months"])
+
+def add_tenant():
+    name = input("Enter tenant's name: ")
+    phone = input("Enter phone number: ")
+    address = input("Enter address: ")
+    rent = input("Enter monthly rent: ")
+    with open(FILENAME, "a", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerow([name, phone, address, rent, 0])
+    print(f"{name} has been added!")
+
+def view_tenants():
+    with open(FILENAME, "r") as file:
+        reader = csv.reader(file)
+        data = list(reader)
+        print(tabulate(data, headers="firstrow", tablefmt="grid"))
+
+def update_rent():
+    tenants = []
+    with open(FILENAME, "r") as file:
+        reader = csv.reader(file)
+        tenants = list(reader)
+
+    name = input("Enter the tenant's name to update rent: ")
+    for row in tenants:
+        if row[0] == name:
+            row[4] = str(int(row[4]) + 1)  # Increase Paid Months
+            print(f"{name}'s rent has been updated!")
+            break
+    else:
+        print("Tenant not found!")
+
+    with open(FILENAME, "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerows(tenants)
+
+def remove_tenant():
+    tenants = []
+    with open(FILENAME, "r") as file:
+        reader = csv.reader(file)
+        tenants = list(reader)
+
+    name = input("Enter the name of the tenant to remove: ")
+    tenants = [row for row in tenants if row[0] != name]
+
+    with open(FILENAME, "w", newline="") as file:
+        writer = csv.writer(file)
+        writer.writerows(tenants)
+
+    print(f"{name} has been removed!")
+
+# Menu system
+while True:
+    print("\n--- Rental Management System ---")
+    print("1. Add New Tenant")
+    print("2. View All Tenants")
+    print("3. Update Rent Payment")
+    print("4. Remove Tenant")
+    print("5. Exit")
+
+    choice = input("Enter your choice: ")
+    
+    if choice == "1":
+        add_tenant()
+    elif choice == "2":
+        view_tenants()
+    elif choice == "3":
+        update_rent()
+    elif choice == "4":
+        remove_tenant()
+    elif choice == "5":
+        break
+    else:
+        print("Invalid choice, please try again!")
